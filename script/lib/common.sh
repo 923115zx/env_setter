@@ -4,7 +4,7 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-09-18 03:43:31 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2017-09-18 06:00:26 PM
+#      LastModified                : 2017-09-18 22:51:53
 #
 ########################################################################
 
@@ -47,5 +47,9 @@ function set_yum ()
 	pinfo "Set Yum Repo"
 	mkdir -p $YumPath
 	cp $2/config/Centos-${1}.repo yum.repo.d/
-
+	cd $YumPath
+	yum -y install epel-release && rpm -Uvh https://li.nux.ro/download/nux/dextop/el${1}/x86_64/nux-dextop-release-0-1.el${1}.nux.noarch.rpm
+	yum clean all && yum makecache && yum -y update
+	cd -
+	pinfo "Set Yum Repo Done"
 }

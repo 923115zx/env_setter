@@ -4,7 +4,7 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-09-18 01:57:24 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2017-09-18 05:58:32 PM
+#      LastModified                : 2017-09-18 22:53:57
 #
 ########################################################################
 
@@ -50,6 +50,7 @@ else
 	while [ retries -ne 0 ]
 	do
 		ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+		# Not verified, I am not sure $? will be 0 when above success.
 		if [ $? -eq 0 ]; then
 			break
 		fi
