@@ -4,7 +4,7 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-09-18 01:57:24 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2017-09-20 21:37:24
+#      LastModified                : 2017-09-20 22:34:21
 #
 ########################################################################
 
@@ -77,4 +77,5 @@ install_script_and_config $CURRENT_PATH
 install_ycm $CURRENT_PATH
 install_airline $CURRENT_PATH
 install_powerlinefont $CURRENT_PATH
+install_vimrc $CURRENT_PATH
 

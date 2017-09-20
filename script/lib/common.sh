@@ -4,7 +4,7 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-09-18 03:43:31 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2017-09-20 21:42:07
+#      LastModified                : 2017-09-20 22:34:19
 #
 ########################################################################
 
@@ -284,5 +284,15 @@ function install_powerlinefont ()
 		pmsg "If you use a terminal to connect server, you need to install these fonts to your \
 			local machine."
 	fi
+}
+
+function install_vimrc ()
+{
+	pinfo "Install vimrc"
+	git clone https://github.com/923115zx/vim-config.git
+	cp vim-config/.vimrc ~/
+	cp -r vim-config/colors ~/.vim
+	cp vim-config/airline-themes/* ~/.vim/autoload/airline/themes/
+	pinfo "Vimrc installed."
 }
 
