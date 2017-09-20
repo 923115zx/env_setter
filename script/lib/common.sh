@@ -4,7 +4,7 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-09-18 03:43:31 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2017-09-19 18:38:35
+#      LastModified                : 2017-09-20 21:42:07
 #
 ########################################################################
 
@@ -12,7 +12,7 @@
 
 YumPath=/etc/yum.repos.d
 YumRecFile=/var/log/.yum_setted
-ScriptRecFile=/var/log/.script_setted
+ScriptRecFile=~/.vim/.script_setted
 
 function last_cmd_ok ()
 {
@@ -24,6 +24,7 @@ function last_cmd_ok ()
 	fi
 }
 
+# Get main version number, like 6 or 7.
 function get_rhel_centos_version ()
 {
 	release_msg=`cat /etc/${CURRENT_OS}-release`
@@ -47,7 +48,7 @@ function get_rhel_centos_version ()
 
 function if_yum_setted ()
 {
-	if [ -e $YumRecFile ]
+	if [ -e $YumRecFile ]; then
 		return 0
 	fi
 	return -1
@@ -82,12 +83,11 @@ function set_yum ()
 
 function if_brew_installed ()
 {
-	findbrew=`which brew`
-	echo $findbrew | grep -q "no brew"
-	if [ $? -ne 0 ]; then
-		return 0
+	brew_ver=`brew --version`
+	if [ "$brew_ver" = "" ]; then
+		return -1
 	fi
-	return -1
+	return 0
 }
 
 function install_homebrew ()
@@ -129,19 +129,19 @@ function install_script_and_config ()
 	pinfo "Script and config installing"
 	mkdir -p $HOME/bin
 	cd $1/script/bin
-	cp $(`ls`) $HOME/bin
+	script_arr=(`ls`)
+	for script_ in ${script_arr[@]}
+	do
+		cp $script_ $HOME/bin/
+		echo "alias ${script_%.*}=\". ${script_}\"" >> $HOME/.bash_profile
+	done
 	cd -
-
-	echo "alias mktest=\". mktest.sh\"" >> $HOME/.bash_profile
-	echo "alias shtest=\". shtest.sh\"" >> $HOME/.bash_profile
-	echo "alias asmtest=\". asmtest.sh\"" >> $HOME/.bash_profile
-	echo "alias git_info=\". git_info.sh\"" >> $HOME/.bash_profile
-	echo "alias svn_diff=\". svn_diff.sh\"" >> $HOME/.bash_profile
 
 	# Not necessary.
 #	mkdir -p $HOME/.gdbinit
 #	echo "set disassembly-flavor intel" > $HOME/.gdbinit
 
+	mkdir -p ~/.vim
 	touch $ScriptRecFile
 	pinfo "scripts and config installed"
 	return 0
@@ -160,7 +160,7 @@ function install_ycm ()
 			perror "Homebrew not installed, please check the installation or reinstall it"
 			exit -1
 		fi
-		packageManager=brew
+		packageManager="brew"
 	else
 		if_yum_setted
 		if [ $? -eq -1 ]; then
@@ -170,10 +170,24 @@ function install_ycm ()
 		packageManager="yum -y"
 	fi
 
-	$packageManager python
-	$packageManager python-devel
+	pinfo "Start to install YouCompleteMe"
 
-	$packageManager cscope
+	# Install python
+	$packageManager install python
+	$packageManager install python-devel
+
+	# Install cscope
+	$packageManager install cscope
+	# Install ctags
+	$packageManager install ctags
+	# Newest YCM need 7.4.1578+ vim, but default system vim is earlier. So we use mvim to
+	# make ycm work.
+	if [ $CURRENT_OS = "darwin" ]; then
+		$packageManager install macvim
+		echo "alias vim=\"mvim -v\"" >> $HOME/.bash_profile
+	else
+		# Don't know in centos/rhel the system default vim has this problem or not.
+	fi
 
 	if [ "`gcc --version`" == "" ]; then
 		pplain "Gcc is not installed, install gcc and g++"
@@ -184,12 +198,91 @@ function install_ycm ()
 	fi
 
 	$packageManager install cmake
+	$packageManager install wget
+
+	# If not in mac os, need to download llvm and clang and build them first.
+	if [ $CURRENT_OS != 'darwin' ]; then
+		wget http://releases.llvm.org/5.0.0/llvm-5.0.0.src.tar.xz
+		wget http://releases.llvm.org/5.0.0/cfe-5.0.0.src.tar.xz
+
+		tar -xvJf llvm-5.0.0.src.tar.xz
+		tar -xvJf cfe-5.0.0.src.tar.xz
+
+		mv cfe-5.0.0.src llvm-5.0.0.src/tools/clang
+		mkdir -p llvm-5.0.0.src/build
+		mkdir -p $1/llvm-binary
+		cd llvm-5.0.0.src/build
+
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=$1/llvm-binary -DCMAKE_BUILD_TYPE=Release ../
+		make -j2 && make install
+		cd $1
+	fi
 
 	git clone https://github.com/Valloric/YouCompleteMe.git
 	cd ./YouCompleteMe
 	git submodule update --init --recursive
+	cd $1
 
-	# TODO
+	build_ycm $1
 
+	pinfo "YouCompleteMe installed ok"
+}
+
+# In darwin, just run the install.sh script to download libclang automatically
+# and compile ycm_core. But in rhel/centos, we need to do that ourselves.
+function build_ycm ()
+{
+	if [ $CURRENT_OS != 'darwin' ]; then
+		mkdir -p $1/YouCompleteMe/build
+		cd $1/YouCompleteMe/build
+		cmake -G "Unix Makefiles" -DPATH_TO_LLVM_ROOT=$1/llvm-binary . $1/YouCompleteMe/third_party/ycmd/cpp
+		cmake --build . --target ycm_core --config Release
+	else
+		$1/YouCompleteMe/install.sh --all
+	fi
+
+	mkdir -p ~/.vim
+	# Copy this folders to ~/.vim to make ycm could be found by vim.
+	cp -r $1/YouCompleteMe/third_party ~/.vim/
+	cp -r $1/YouCompleteMe/python ~/.vim/
+	cp -r $1/YouCompleteMe/plugin ~/.vim/
+	cp -r $1/YouCompleteMe/autoload ~/.vim/
+	cp -r $1/YouCompleteMe/doc ~/.vim/
+
+	cp $1/config/.ycm_extra_conf.py ~/.vim/
+	cd $1
+}
+
+# The second plugin I use, besides Ycm.
+function install_airline ()
+{
+	pinfo "Start install airline"
+	git clone https://github.com/vim-airline/vim-airline.git
+	cd vim-airline
+	all_files=(`ls`)
+	for file in ${all_files[@]}
+	do
+		if [ -d ${file} ]; then
+			cp -r ${file} ~/.vim/
+		fi
+	done
+	pinfo "Airline installed"
+}
+
+# If not install these fonts, the arrow will be random code.
+function install_powerlinefont ()
+{
+	pinfo "Install powerlinefonts"
+	git clone https://github.com/powerline/fonts.git
+	cd fonts
+	./install.sh
+	cd -
+	pinfo "Powerlinefonts installed"
+	if [ $CURRENT_OS = 'darwin' ]; then
+		pmsg "Then you might need to change fonts for you terminal for show the effect out."
+	else
+		pmsg "If you use a terminal to connect server, you need to install these fonts to your \
+			local machine."
+	fi
 }
 
