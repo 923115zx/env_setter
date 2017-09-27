@@ -25,7 +25,7 @@ case $SYSTEM in
 		CURRENT_OS="darwin" ;;
 	Linux)
 		if [ -s /etc/redhat-release ]; then
-			CURRENT_OS="readhat"
+			CURRENT_OS="redhat"
 		elif [ -s /etc/centos-release ]; then
 			CURRENT_OS="centos"
 		else
