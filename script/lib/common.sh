@@ -13,6 +13,7 @@
 YumPath=/etc/yum.repos.d
 YumRecFile=/var/log/.yum_setted
 ScriptRecFile=~/.vim/.script_setted
+Main_ver=""
 
 function last_cmd_ok ()
 {
@@ -37,13 +38,14 @@ function get_rhel_centos_version ()
 		fi
 		if [ "$main_ver" != "6" ] && [ "$main_ver" != "7" ]; then
 			perror "Only 6.x and 7.x be supported. Sorry."
-			return -1
+			return 1
 		fi
 		pmsg "found, main_ver=${main_ver}"
-		return $main_ver
+		Main_ver=$main_ver
+		return 0
 	done
 	perror "Not found main version in release msg. quit."
-	return -1
+	return 1
 }
 
 function if_yum_setted ()
@@ -51,7 +53,7 @@ function if_yum_setted ()
 	if [ -e $YumRecFile ]; then
 		return 0
 	fi
-	return -1
+	return 1
 }
 
 function set_yum ()
@@ -63,14 +65,15 @@ function set_yum ()
 	fi
 
 	get_rhel_centos_version
-	if [ $? -eq -1 ]; then
+	if [ $? -eq 1 ]; then
 		return $?
 	fi
 
-	ver=$?
+	ver=$Main_ver
 	pinfo "Set Yum Repo"
 	mkdir -p $YumPath
-	cp $1/config/Centos-${ver}.repo yum.repo.d/
+	echo "cp $1/config/Centos-${ver}.repo $YumPath/"
+	cp $1/config/Centos-${ver}.repo $YumPath/
 	cd $YumPath
 	yum -y install epel-release && rpm -Uvh https://li.nux.ro/download/nux/dextop/el${ver}/x86_64/nux-dextop-release-0-1.el${ver}.nux.noarch.rpm
 	yum clean all && yum makecache && yum -y update
@@ -85,7 +88,7 @@ function if_brew_installed ()
 {
 	brew_ver=`brew --version`
 	if [ "$brew_ver" = "" ]; then
-		return -1
+		return 1
 	fi
 	return 0
 }
@@ -112,7 +115,7 @@ function install_homebrew ()
 
 	if [ $retries -eq 0 ]; then
 		perror "Fail to install homebrew."
-		return -1
+		return 1
 	fi
 
 	pinfo "Install homebrew success."
@@ -156,14 +159,14 @@ function install_ycm ()
 
 	if [ $CURRENT_OS = "darwin" ]; then
 		if_brew_installed
-		if [ $? -eq -1 ]; then
+		if [ $? -eq 1 ]; then
 			perror "Homebrew not installed, please check the installation or reinstall it"
 			exit -1
 		fi
 		packageManager="brew"
 	else
 		if_yum_setted
-		if [ $? -eq -1 ]; then
+		if [ $? -eq 1 ]; then
 			perror "Yum not be set, please check configuration or reset it"
 			exit -1
 		fi
@@ -187,6 +190,7 @@ function install_ycm ()
 		echo "alias vim=\"mvim -v\"" >> $HOME/.bash_profile
 	else
 		# Don't know in centos/rhel the system default vim has this problem or not.
+		echo ""
 	fi
 
 	if [ "`gcc --version`" == "" ]; then
@@ -197,8 +201,13 @@ function install_ycm ()
 		pplain "Gcc and G++ installation finished"
 	fi
 
-	$packageManager install cmake
 	$packageManager install wget
+	if [ $CURRENT_OS = "darwin" ]; then
+		$packageManager install cmake
+	else
+		wget https://cmake.org/files/v3.9/cmake-3.9.3-Linux-x86_64.sh
+		./cmake-3.9.3-Linux-x86_64.sh --prefix=/
+	fi
 
 	# If not in mac os, need to download llvm and clang and build them first.
 	if [ $CURRENT_OS != 'darwin' ]; then
