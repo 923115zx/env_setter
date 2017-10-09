@@ -21,11 +21,18 @@ echo "#include <stdlib.h>" >> ${1}.cc
 echo "#include <string.h>" >> ${1}.cc
 echo "#include <map>" >> ${1}.cc
 echo "#include <vector>" >> ${1}.cc
+echo "#include <set>" >> ${1}.cc
+echo "#include <string>" >> ${1}.cc
+echo "" >> ${1}.cc
+echo "using std::vector;" >> ${1}.cc
+echo "using std::map;" >> ${1}.cc
+echo "using std::set;" >> ${1}.cc
 echo "" >> ${1}.cc
 echo "int main(int argc, char* argv[])" >> ${1}.cc
 echo "{" >> ${1}.cc
 echo "	(void)argc;" >> ${1}.cc
 echo "	(void)argv;" >> ${1}.cc
+echo "" >> ${1}.cc
 echo "	return 0;" >> ${1}.cc
 echo "}" >> ${1}.cc
 
