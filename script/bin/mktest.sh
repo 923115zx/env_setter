@@ -27,7 +27,21 @@ echo "" >> ${1}.cc
 echo "using std::vector;" >> ${1}.cc
 echo "using std::map;" >> ${1}.cc
 echo "using std::set;" >> ${1}.cc
+echo "using std::string;" >> ${1}.cc
 echo "" >> ${1}.cc
+echo "//struct TreeNode" >> ${1}.cc
+echo "//{" >> ${1}.cc
+echo -e "//\tint val;" >> ${1}.cc
+echo -e "//\tTreeNode* left;" >> ${1}.cc
+echo -e "//\tTreeNode* right;" >> ${1}.cc
+echo -e "//\tTreeNode(int x) : val(x), left(NULL), right(NULL) {}" >> ${1}.cc
+echo -e "//}\n" >> ${1}.cc
+echo "//struct ListNode" >> ${1}.cc
+echo "//{" >> ${1}.cc
+echo -e "//\tint val;" >> ${1}.cc
+echo -e "//\tListNode* next;" >> ${1}.cc
+echo -e "//\tListNode(int x) : val(x), next(NULL) {}" >> ${1}.cc
+echo -e "//}\n" >> ${1}.cc
 echo "int main(int argc, char* argv[])" >> ${1}.cc
 echo "{" >> ${1}.cc
 echo "	(void)argc;" >> ${1}.cc
