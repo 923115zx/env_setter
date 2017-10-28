@@ -56,10 +56,10 @@ add_line "public:"
 add_line "};\n"
 add_line "int main(int argc, char* argv[])"
 add_line "{"
-add_line "	(void)argc;"
-add_line "	(void)argv;"
+add_line "\t(void)argc;"
+add_line "\t(void)argv;"
 add_line ""
-add_line "	return 0;"
+add_line "\treturn 0;"
 add_line "}"
 
 prepareProject.sh
