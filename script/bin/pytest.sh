@@ -4,7 +4,7 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-11-07 17:08:30
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2017-11-10 10:52:17
+#      LastModified                : 2017-12-08 16:12:26
 #
 ########################################################################
 
@@ -28,5 +28,6 @@ function add_line
 	echo -e $1 >> $pyfile
 }
 
-add_line "#!/usr/bin/env python3\n"
+add_line "#!/usr/bin/env python3"
+add_line "# -*- coding: utf-8 -*-\n"
 
