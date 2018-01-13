@@ -4,7 +4,7 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-09-18 01:57:24 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2017-09-20 22:34:21
+#      LastModified                : 2018-01-13 16:10:12
 #
 ########################################################################
 
@@ -13,7 +13,7 @@
 source ./script/lib/color.sh
 source ./script/lib/common.sh
 
-SUPPORT_OS=("darwin" "centos" "redhat")
+SUPPORT_OS=("darwin" "centos" "redhat" "ubuntu")
 SYSTEM=`uname -s`
 SUPPORTED=1
 CURRENT_PATH=$(cd `dirname $0`; pwd)
@@ -24,16 +24,38 @@ case $SYSTEM in
 	Darwin)
 		CURRENT_OS="darwin" ;;
 	Linux)
-		if [ -s /etc/redhat-release ]; then
-			CURRENT_OS="redhat"
-		elif [ -s /etc/centos-release ]; then
+		if [ -s /etc/centos-release ]; then
 			CURRENT_OS="centos"
+			release_content=(`cat /etc/centos-release`)
+			if [ ${release_content[3]:0:1} != 7 ]; then
+				perror "For now just support centos 7 or higher."
+				exit 0
+			fi
+		elif [ -s /etc/redhat-release ]; then
+			CURRENT_OS="redhat"
+			release_content=(`cat /etc/redhat-release`)
+			if [ ${release_content[3]:0:1} != 7 ]; then
+				perror "For now just support redhat 7 or higher."
+				exit 0
+			fi
+		elif [ -s /etc/lsb-release ]; then
+			release_content=(`cat /etc/lsb-release`)
+			if [ ${release_content[0]:${#release_content[0]}-6:6} = "Ubuntu" ]; then
+				CURRENT_OS="ubuntu"
+				if [ ${release_content[1]:${#release_content[1]}-5:5} != "16.04"]; then
+					perror "Sorry now just support ubuntu 16.04."
+					exit 0
+				fi
+			else
+				CURRENT_OS="Unknow Linux"
+				SUPPORTED=0
+			fi
 		else
 			CURRENT_OS="Unknow Linux"
 			SUPPORTED=0
 		fi ;;
 	*)
-		CURRENT_OS="Unknow Unix/Linux"
+		CURRENT_OS="Unsupported OS"
 		SUPPORTED=0 ;;
 esac
 
@@ -46,7 +68,7 @@ fi
 # Different hint.
 if [ $CURRENT_OS = "darwin" ]; then
 	question="Install homebrew"
-else
+elif [ $CURRENT_OS = "centos" ] || [ $CURRENT_OS = "redhat" ]; then
 	question="Set yum"
 fi
 

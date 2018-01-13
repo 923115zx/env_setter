@@ -4,7 +4,7 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-09-18 03:43:31 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2017-09-20 22:34:19
+#      LastModified                : 2018-01-13 16:22:28
 #
 ########################################################################
 
@@ -124,30 +124,34 @@ function install_homebrew ()
 
 function install_script_and_config ()
 {
-	if [ -e $ScriptRecFile ]; then
-		pinfo "script has been setted"
-		return 0
+	cur_dir=`pwd`
+	cd $CURRENT_PATH/script/bin
+
+	profile=$HOME/.bash_profile
+	if [ $CURRENT_OS = "ubuntu" ]; then
+		profile=$HOME/.bashrc
 	fi
-
-	pinfo "Script and config installing"
 	mkdir -p $HOME/bin
-	cd $1/script/bin
-	script_arr=(`ls`)
-	for script_ in ${script_arr[@]}
+	mkdir -p $HOME/.vim
+	scripts=(`ls`)
+	for script in ${scripts[@]}
 	do
-		cp $script_ $HOME/bin/
-		echo "alias ${script_%.*}=\". ${script_}\"" >> $HOME/.bash_profile
+		cp $script $HOME/bin/
+		script_alias="alias ${script%.*}=\". ${script}\""
+		if cat $profile | grep "$script_alias" > /dev/null
+		then
+			pinfo "alias of ${script} has been added to profile already."
+		else
+			echo "$script_alias" >> $profile
+		fi
 	done
-	cd -
 
-	# Not necessary.
-#	mkdir -p $HOME/.gdbinit
-#	echo "set disassembly-flavor intel" > $HOME/.gdbinit
-
-	mkdir -p ~/.vim
-	touch $ScriptRecFile
-	pinfo "scripts and config installed"
-	return 0
+	# NOT a good idea.
+#	if [ $CURRENT_OS != "darwin" ]; then
+#		touch $HOME/.gdbinit
+#		echo "set disassembly-flavor inter" > $HOME/.gdbinit
+#	fi
+	cd $cur_dir
 }
 
 function install_ycm ()
@@ -157,7 +161,9 @@ function install_ycm ()
 		return 0
 	fi
 
-	if [ $CURRENT_OS = "darwin" ]; then
+	if [ $CURRENT_OS = "ubuntu" ]; then
+		packageManager="apt-get -y"
+	elif [ $CURRENT_OS = "darwin" ]; then
 		if_brew_installed
 		if [ $? -eq 1 ]; then
 			perror "Homebrew not installed, please check the installation or reinstall it"
@@ -191,17 +197,17 @@ function install_ycm ()
 	else
 		# Don't know in centos/rhel the system default vim has this problem or not.
 		echo ""
-	fi
-
-	if [ "`gcc --version`" == "" ]; then
-		pplain "Gcc is not installed, install gcc and g++"
-		$packageManager install gcc
-		$packageManager install gcc-c++
-		$packageManager install libstdc++-devel
-		pplain "Gcc and G++ installation finished"
+		if [ "`gcc --version`" == "" ]; then
+			pplain "Gcc is not installed, install gcc and g++"
+			$packageManager install gcc
+			$packageManager install gcc-c++
+			$packageManager install libstdc++-devel
+			pplain "Gcc and G++ installation finished"
+		fi
 	fi
 
 	$packageManager install wget
+	$packageManager install git
 	if [ $CURRENT_OS = "darwin" ]; then
 		$packageManager install cmake
 	else
@@ -210,7 +216,10 @@ function install_ycm ()
 	fi
 
 	# If not in mac os, need to download llvm and clang and build them first.
-	if [ $CURRENT_OS != 'darwin' ]; then
+	if [ $CURRENT_OS = "ubuntu" ]; then
+		wget http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu16.04.tar.xz
+		tar -xzJf clang+llvm-5.0.0-linux-x86_64-ubuntu16.04.tar.xz
+	elif [ $CURRENT_OS != 'darwin' ]; then
 		wget http://releases.llvm.org/5.0.0/llvm-5.0.0.src.tar.xz
 		wget http://releases.llvm.org/5.0.0/cfe-5.0.0.src.tar.xz
 
@@ -241,7 +250,11 @@ function install_ycm ()
 # and compile ycm_core. But in rhel/centos, we need to do that ourselves.
 function build_ycm ()
 {
-	if [ $CURRENT_OS != 'darwin' ]; then
+	if [ $CURRENT_OS = "ubuntu" ]; then
+		mkdir -p $1/YouCompleteMe/build
+		cd $1/YouCompleteMe/build
+		cmake -G "Unix Makefiles" -DPATH_TO_LLVM_ROOT=$1/clang+llvm-5.0.0-linux-x86_64-ubuntu16.04 . $1/YouCompleteMe/third_party/ycmd/cpp
+	elif [ $CURRENT_OS != 'darwin' ]; then
 		mkdir -p $1/YouCompleteMe/build
 		cd $1/YouCompleteMe/build
 		cmake -G "Unix Makefiles" -DPATH_TO_LLVM_ROOT=$1/llvm-binary . $1/YouCompleteMe/third_party/ycmd/cpp
