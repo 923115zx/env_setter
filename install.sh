@@ -4,7 +4,7 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-09-18 01:57:24 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2018-01-13 16:10:12
+#      LastModified                : 2018-01-15 10:49:21
 #
 ########################################################################
 
@@ -42,7 +42,7 @@ case $SYSTEM in
 			release_content=(`cat /etc/lsb-release`)
 			if [ ${release_content[0]:${#release_content[0]}-6:6} = "Ubuntu" ]; then
 				CURRENT_OS="ubuntu"
-				if [ ${release_content[1]:${#release_content[1]}-5:5} != "16.04"]; then
+				if [ ${release_content[1]:${#release_content[1]}-5:5} != "16.04" ]; then
 					perror "Sorry now just support ubuntu 16.04."
 					exit 0
 				fi
@@ -74,29 +74,31 @@ fi
 
 # Actually yum don't need to read permission. Because we will check if
 # installed or setted later.
-for ((i=0; i<3; ++i))
-do
-	pplain "$question? [y/n] "
-	read line
-	if [ $line != "y" ] && [ $line != "n" ]; then
-		pmsg "please input 'y' or 'n'"
-	else
-		break
-	fi
-done
+if [ $CURRENT_OS != "ubuntu" ]; then
+	for ((i=0; i<3; ++i))
+	do
+		pplain "$question? [y/n] "
+		read line
+		if [ $line != "y" ] && [ $line != "n" ]; then
+			pmsg "please input 'y' or 'n'"
+		else
+			break
+		fi
+	done
 
-if [ $line = "y" ]; then
-	if [ $CURRENT_OS != "darwin" ]; then
-		# yum setting.
-		set_yum $CURRENT_PATH
-	else
-		# install homebrew. XXX: during then installation user need to type their passwd.
-		install_homebrew
+	if [ $line = "y" ]; then
+		if [ $CURRENT_OS != "darwin" ]; then
+			# yum setting.
+			set_yum $CURRENT_PATH
+		else
+			# install homebrew. XXX: during then installation user need to type their passwd.
+			install_homebrew
+		fi
 	fi
 fi
 
 install_script_and_config $CURRENT_PATH
-install_ycm $CURRENT_PATH
+install_manager $CURRENT_PATH
 install_airline $CURRENT_PATH
 install_powerlinefont $CURRENT_PATH
 install_vimrc $CURRENT_PATH

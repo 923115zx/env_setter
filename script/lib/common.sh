@@ -4,7 +4,7 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-09-18 03:43:31 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2018-01-13 16:22:28
+#      LastModified                : 2018-01-15 19:42:31
 #
 ########################################################################
 
@@ -154,7 +154,7 @@ function install_script_and_config ()
 	cd $cur_dir
 }
 
-function install_ycm ()
+function install_manager()
 {
 	if [ -e $HOME/.vim/plugin/youcompleteme.vim ]; then
 		pinfo "YouCompleteMe already be installed"
@@ -183,7 +183,11 @@ function install_ycm ()
 
 	# Install python
 	$packageManager install python
-	$packageManager install python-devel
+	if [ $CURRENT_OS = "ubuntu" ]; then
+		$packageManager install python-dev
+	else
+		$packageManager install python-devel
+	fi
 
 	# Install cscope
 	$packageManager install cscope
@@ -211,8 +215,14 @@ function install_ycm ()
 	if [ $CURRENT_OS = "darwin" ]; then
 		$packageManager install cmake
 	else
-		wget https://cmake.org/files/v3.9/cmake-3.9.3-Linux-x86_64.sh
-		./cmake-3.9.3-Linux-x86_64.sh --prefix=/
+		wget https://cmake.org/files/v3.9/cmake-3.9.3-Linux-x86_64.tar.gz
+		tar -xzvf cmake-3.9.3-Linux-x86_64.tar.gz
+		cd cmake-3.9.3-Linux-x86_64
+		cp -r bin /usr/
+		cp -r doc /usr/share/
+		cp -r man /usr/share/
+		cp -r share /usr/
+		cd -
 	fi
 
 	# If not in mac os, need to download llvm and clang and build them first.
@@ -254,6 +264,7 @@ function build_ycm ()
 		mkdir -p $1/YouCompleteMe/build
 		cd $1/YouCompleteMe/build
 		cmake -G "Unix Makefiles" -DPATH_TO_LLVM_ROOT=$1/clang+llvm-5.0.0-linux-x86_64-ubuntu16.04 . $1/YouCompleteMe/third_party/ycmd/cpp
+		cmake --build . --target ycm_core --config Release
 	elif [ $CURRENT_OS != 'darwin' ]; then
 		mkdir -p $1/YouCompleteMe/build
 		cd $1/YouCompleteMe/build
@@ -264,12 +275,13 @@ function build_ycm ()
 	fi
 
 	mkdir -p ~/.vim
+	mv $1/YouCompleteMe ~/.vim/
 	# Copy this folders to ~/.vim to make ycm could be found by vim.
-	cp -r $1/YouCompleteMe/third_party ~/.vim/
-	cp -r $1/YouCompleteMe/python ~/.vim/
-	cp -r $1/YouCompleteMe/plugin ~/.vim/
-	cp -r $1/YouCompleteMe/autoload ~/.vim/
-	cp -r $1/YouCompleteMe/doc ~/.vim/
+	cp -r ~/.vim/YouCompleteMe/plugin ~/.vim/
+	cp -r ~/.vim/YouCompleteMe/doc ~/.vim/
+	cp -r ~/.vim/YouCompleteMe/autoload ~/.vim/
+	ln -s $HOME/.vim/YouCompleteMe/third_party $HOME/.vim/third_party
+	ln -s $HOME/.vim/YouCompleteMe/python $HOME/.vim/python
 
 	cp $1/config/.ycm_extra_conf.py ~/.vim/
 	cd $1
