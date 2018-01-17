@@ -228,7 +228,7 @@ function install_manager()
 	# If not in mac os, need to download llvm and clang and build them first.
 	if [ $CURRENT_OS = "ubuntu" ]; then
 		wget http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu16.04.tar.xz
-		tar -xzJf clang+llvm-5.0.0-linux-x86_64-ubuntu16.04.tar.xz
+		tar -xJvf clang+llvm-5.0.0-linux-x86_64-ubuntu16.04.tar.xz
 	elif [ $CURRENT_OS != 'darwin' ]; then
 		wget http://releases.llvm.org/5.0.0/llvm-5.0.0.src.tar.xz
 		wget http://releases.llvm.org/5.0.0/cfe-5.0.0.src.tar.xz
