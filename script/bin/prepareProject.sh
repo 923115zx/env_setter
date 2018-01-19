@@ -6,7 +6,18 @@ find $absPath -name "*.h" -o -name "*.c" -o -name "*.hpp" -o -name "*.cc" -o -na
 cscope -bkq -i cscope.files
 rm cscope.files
 
-OS=`uname -s`
+#OS=`uname -s`
+lnr=0
+while read line
+do
+	if [ $lnr -ne 2 ]; then
+		lnr=$(($lnr + 1))
+	else
+		IDline="${line}"
+		break
+	fi
+done < /etc/os-release
+OS=${IDline:3}
 
 # Only parse c++ files. Add .c to c++ filetypes, and delete hpp out from c++ filetypes.
 # The boost headers are all .hpp, so...you know it.
@@ -30,17 +41,12 @@ lib_tag_file=$HOME/.lib_tags
 if [ ! -f $lib_tag_file ]
 then
 	ctags -f $lib_tag_file $ctags_flags $sys_include_dir/*
-	ctags -f $lib_tag_file --append=yes $ctags_flags $sys_include_dir/sys/*
-#	if [ "$OS" != "Darwin" ]; then
-#		ctags -f $lib_tag_file --append=yes $ctags_flags $sys_include_dir/linux/*
-#		cpp_version=`g++ --version`
-#		cppv_arr=($cpp_version)
-#		ctags -f $lib_tag_file -R --append=yes $ctags_flags $sys_include_dir/c++/${cppv_arr[2]}/*
-#	else
-#		cppv_arr=(`ls $sys_include_dir/c++/`)
-#		largeNr=$((${#cppv_arr[@]} - 1))
-#		ctags -f $lib_tag_file -R --append=yes $ctags_flags $sys_include_dir/c++/${cppv_arr[$largeNr]}/*
-#	fi
+	if [ $OS = 'ubuntu' ]; then
+		ctags -f $lib_tag_file --append=yes $ctags_flags $sys_include_dir/x86_64-linux-gnu/sys/*
+	else
+		ctags -f $lib_tag_file --append=yes $ctags_flags $sys_include_dir/sys/*
+	fi
+
 	cppv_arr=(`ls $sys_include_dir/c++/`)
 	largeNr=$((${#cppv_arr[@]} - 1))
 	ctags -f $lib_tag_file -R --append=yes $ctags_flags $sys_include_dir/c++/${cppv_arr[$largeNr]}/*
