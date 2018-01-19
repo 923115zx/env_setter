@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Cscope build.
 absPath=`pwd`"/"
@@ -31,16 +31,20 @@ if [ ! -f $lib_tag_file ]
 then
 	ctags -f $lib_tag_file $ctags_flags $sys_include_dir/*
 	ctags -f $lib_tag_file --append=yes $ctags_flags $sys_include_dir/sys/*
-	if [ "$OS" != "Darwin" ]; then
-		ctags -f $lib_tag_file --append=yes $ctags_flags $sys_include_dir/linux/*
-		cpp_version=`g++ --version`
-		cppv_arr=($cpp_version)
-		ctags -f $lib_tag_file -R --append=yes $ctags_flags $sys_include_dir/c++/${cppv_arr[2]}/*
-	else
-		cppv_arr=(`ls $sys_include_dir/c++/`)
-		largeNr=$((${#cppv_arr[@]} - 1))
-		ctags -f $lib_tag_file -R --append=yes $ctags_flags $sys_include_dir/c++/${cppv_arr[$largeNr]}/*
-	fi
+#	if [ "$OS" != "Darwin" ]; then
+#		ctags -f $lib_tag_file --append=yes $ctags_flags $sys_include_dir/linux/*
+#		cpp_version=`g++ --version`
+#		cppv_arr=($cpp_version)
+#		ctags -f $lib_tag_file -R --append=yes $ctags_flags $sys_include_dir/c++/${cppv_arr[2]}/*
+#	else
+#		cppv_arr=(`ls $sys_include_dir/c++/`)
+#		largeNr=$((${#cppv_arr[@]} - 1))
+#		ctags -f $lib_tag_file -R --append=yes $ctags_flags $sys_include_dir/c++/${cppv_arr[$largeNr]}/*
+#	fi
+	cppv_arr=(`ls $sys_include_dir/c++/`)
+	largeNr=$((${#cppv_arr[@]} - 1))
+	ctags -f $lib_tag_file -R --append=yes $ctags_flags $sys_include_dir/c++/${cppv_arr[$largeNr]}/*
+
 	ctags -f $lib_tag_file --append=yes $ctags_flags $sys_include_dir/arpa/*
 	ctags -f $lib_tag_file --append=yes $ctags_flags $sys_include_dir/netinet/*
 fi

@@ -4,11 +4,11 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-09-18 03:43:31 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2018-01-15 19:42:31
+#      LastModified                : 2018-01-19 13:46:23
 #
 ########################################################################
 
-#!/bin/sh
+#!/bin/bash
 
 YumPath=/etc/yum.repos.d
 YumRecFile=/var/log/.yum_setted

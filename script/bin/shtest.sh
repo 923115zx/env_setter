@@ -4,11 +4,11 @@
 #	Author						: Zhao Xin
 #	CreateTime					: 2016-12-05 01:43:26 PM
 #	VIM							: ts=4, sw=4
-#	LastModified                : 2018-01-13 13:40:40
+#	LastModified                : 2018-01-19 13:46:08
 #
 #######################################################################
 
-#!/bin/sh
+#!/bin/bash
 
 if [ $# -eq 0 ]; then
 	echo "No test file specified."

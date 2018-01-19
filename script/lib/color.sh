@@ -4,11 +4,11 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-09-18 03:23:46 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2017-09-18 05:52:19 PM
+#      LastModified                : 2018-01-19 13:46:32
 #
 ########################################################################
 
-#!/bin/sh
+#!/bin/bash
 
 # OutPut color
 Blank="\033[0m"

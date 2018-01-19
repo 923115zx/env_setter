@@ -4,11 +4,11 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-06-20 11:02:31 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2017-07-03 12:29:23 AM
+#      LastModified                : 2018-01-18 20:29:03
 #
 ########################################################################
 
-#!/bin/sh
+#!/bin/bash
 
 asmTestPath=$HOME/work/asmtest
 mkfile=Makefile
