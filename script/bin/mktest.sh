@@ -12,7 +12,7 @@ mkdir -p ${baseTestPath}/$1
 cd ${baseTestPath}/$1
 touch ${1}.cc
 touch $buildFile
-echo "#!/bin/sh" >> $buildFile
+echo "#!/bin/bash" >> $buildFile
 echo "g++ -g -std=c++11 ${1}.cc -o $1" >> $buildFile
 chmod 744 $buildFile
 ccfile=${1}.cc

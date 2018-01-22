@@ -4,11 +4,11 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-09-18 01:57:24 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2018-01-15 10:49:21
+#      LastModified                : 2018-01-22 15:57:43
 #
 ########################################################################
 
-#!/bin/sh
+#!/bin/bash
 
 source ./script/lib/color.sh
 source ./script/lib/common.sh
