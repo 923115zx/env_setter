@@ -2,7 +2,7 @@
 # File            : gotest.sh
 # Author          : ZhaoXin
 # CreateTime      : 2018-05-07 13:56:46
-# LastModified    : 2018-05-07 14:09:32
+# LastModified    : 2018-05-07 14:52:30
 # Vim             : ts=4, sw=4
 #
 
@@ -21,7 +21,7 @@ cd ${baseTestPath}/$1
 gofile=${1}.go
 touch ${gofile}
 touch $buildFile
-echo "#!/bin/env bash" >> $buildFile
+echo "#!/usr/bin/env bash" >> $buildFile
 echo "go build ${1}.go" >> $buildFile
 chmod 744 $buildFile
 
