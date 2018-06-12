@@ -4,7 +4,7 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-09-18 03:43:31 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2018-06-12 10:13:21
+#      LastModified                : 2018-06-12 15:58:24
 #
 ########################################################################
 
@@ -266,12 +266,12 @@ function build_ycm ()
 		cmake -G "Unix Makefiles" -DPATH_TO_LLVM_ROOT=$1/clang+llvm-5.0.0-linux-x86_64-ubuntu16.04 . $1/YouCompleteMe/third_party/ycmd/cpp
 		cmake --build . --target ycm_core --config Release
 	elif [ $CURRENT_OS != 'darwin' ]; then
-#		mkdir -p $1/YouCompleteMe/build
-#		cd $1/YouCompleteMe/build
-#		cmake -G "Unix Makefiles" -DPATH_TO_LLVM_ROOT=$1/llvm-binary . $1/YouCompleteMe/third_party/ycmd/cpp
-#		cmake --build . --target ycm_core --config Release
-		$1/YouCompleteMe/install.py --clang-completer --go-completer
+		mkdir -p $1/YouCompleteMe/build
+		cd $1/YouCompleteMe/build
+		cmake -G "Unix Makefiles" -DPATH_TO_LLVM_ROOT=$1/llvm-binary . $1/YouCompleteMe/third_party/ycmd/cpp
+		cmake --build . --target ycm_core --config Release
 	else
+		# Actually add --go-completer doesn't help, still need to add vim-go plugin yourself.
 		$1/YouCompleteMe/install.py --clang-completer --go-completer
 	fi
 
