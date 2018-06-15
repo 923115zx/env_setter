@@ -4,7 +4,7 @@
 #      Author                      : Zhao Xin
 #      CreateTime                  : 2017-09-18 01:57:24 PM
 #      VIM                         : ts=4, sw=4
-#      LastModified                : 2018-01-22 15:57:43
+#      LastModified                : 2018-06-15 15:57:34
 #
 ########################################################################
 
@@ -42,6 +42,7 @@ case $SYSTEM in
 			release_content=(`cat /etc/lsb-release`)
 			if [ ${release_content[0]:${#release_content[0]}-6:6} = "Ubuntu" ]; then
 				CURRENT_OS="ubuntu"
+				# Maybe 14.04 install ycm ok too, change here later.
 				if [ ${release_content[1]:${#release_content[1]}-5:5} != "16.04" ]; then
 					perror "Sorry now just support ubuntu 16.04."
 					exit 0
