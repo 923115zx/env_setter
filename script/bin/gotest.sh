@@ -2,7 +2,7 @@
 # File            : gotest.sh
 # Author          : ZhaoXin
 # CreateTime      : 2018-05-07 13:56:46
-# LastModified    : 2018-05-07 14:52:30
+# LastModified    : 2018-06-19 19:34:19
 # Vim             : ts=4, sw=4
 #
 
@@ -13,7 +13,7 @@ if [ $# -eq 0 ]; then
 	exit 0
 fi
 
-baseTestPath=~/work/gotest
+baseTestPath=~/go/src/test
 buildFile=build.sh
 
 mkdir -p ${baseTestPath}/$1
